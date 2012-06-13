@@ -61,6 +61,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analytics.cs" />
+    <Compile Include="Data\AnalyticsData.cs" />
     <Compile Include="Data\EndpointDefinition.cs" />
     <Compile Include="Data\MapsApiData.cs" />
     <Compile Include="Data\OverlayInfo.cs" />

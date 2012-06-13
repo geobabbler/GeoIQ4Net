@@ -219,9 +219,9 @@ namespace GeoIQ.Net
 
                 //return null;
             }
-            catch
+            catch (Exception wex)
             {
-                return null;
+                throw wex;
             }
         }
 
