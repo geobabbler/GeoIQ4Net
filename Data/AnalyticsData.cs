@@ -31,6 +31,7 @@ namespace GeoIQ.Net.Data
 {
     //{"data_type": "Dataset Analysis", "title": "Dataset from 'Maryland Towns' with a 5km buffer", "id": "251436"}
     [Serializable]
+    [DataContract]
     public class AnalyticsResponse
     {
         [DataMember(Name = "id")]

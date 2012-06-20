@@ -92,6 +92,7 @@ namespace GeoIQ.Net
                 DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(GeoIQ.Net.Data.AnalyticsResponse));
                 byte[] bytes = Encoding.ASCII.GetBytes(response);
                 System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
+                stream.Position = 0;
                 GeoIQ.Net.Data.AnalyticsResponse result = (GeoIQ.Net.Data.AnalyticsResponse)serializer.ReadObject(stream);
 
                 //args._result = response.Status;
