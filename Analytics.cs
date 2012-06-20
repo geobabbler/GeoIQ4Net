@@ -43,7 +43,8 @@ namespace GeoIQ.Net
     {
         #region
 
-        public string _bufferTemplate = "{0}/analysis.json?calculation=buffer&ds1={1}&distance={2}&unit={3}";
+        private string _getStateTemplate = "{0}/overlays/get_state/{1}";
+        private string _bufferTemplate = "{0}/analysis.json?calculation=buffer&ds1={1}&distance={2}&unit={3}";
 
         #endregion
 
@@ -77,9 +78,26 @@ namespace GeoIQ.Net
 
         #region Synchronous Methods
 
+        public string GetState(int overlayid)
+        {
+            string retval = "";
+            try
+            {
+                WebClient request = new WebClient();
+                string url = String.Format(_getStateTemplate, EndpointURI, overlayid);
+                setCredentials(request);
+                retval = request.DownloadString(url);
+            }
+            catch (Exception ex)
+            {
+                this.LastError = ex;
+                retval = "error";
+            }
+            return retval;
+        }
+
         public AnalyticsResponse Buffer(int overlayid, int distance, string units)
         {
-            ResponseStatusEventArgs args = new ResponseStatusEventArgs();
             AnalyticsResponse retval = null;
             try
             {
@@ -95,10 +113,7 @@ namespace GeoIQ.Net
                 stream.Position = 0;
                 GeoIQ.Net.Data.AnalyticsResponse result = (GeoIQ.Net.Data.AnalyticsResponse)serializer.ReadObject(stream);
 
-                //args._result = response.Status;
-                //args._location = response.Location;
                 retval = result;
-
             }
             catch (Exception ex)
             {
