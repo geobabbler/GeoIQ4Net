@@ -39,7 +39,7 @@ using System.Xml;
 
 namespace GeoIQ.Net
 {
-    public enum IntersectMergeOptions
+    public enum MergeOptions
     {
         combine,
         prefer_1,
@@ -53,6 +53,7 @@ namespace GeoIQ.Net
         private string _getStateTemplate = "{0}/overlays/get_state/{1}";
         private string _bufferTemplate = "{0}/analysis.json?calculation=buffer&ds1={1}&distance={2}&unit={3}";
         private string _intersectTemplate = "{0}/analysis.json?calculation=intersect&ds1={1}&ds2={2}&merge={3}";
+        private string _clipTemplate = "{0}/analysis.json?calculation=clip&ds1={1}&ds2={2}";
 
         #endregion
 
@@ -131,13 +132,41 @@ namespace GeoIQ.Net
             return retval;
         }
 
-        public AnalyticsResponse Intersect(int overlayid1, int overlayid2, IntersectMergeOptions merge)
+        public AnalyticsResponse Clip(int targetoverlayid, int clippingoverlayid)
         {
             AnalyticsResponse retval = null;
             try
             {
                 GeoComWebClient request = new GeoComWebClient();
-                string mergestring = Enum.GetName(typeof(IntersectMergeOptions), merge);
+                string url = String.Format(_clipTemplate, EndpointURI, targetoverlayid, clippingoverlayid);
+                setCredentials(request);
+
+                //validateFileType(files);
+                string response = request.Post(url, UserName, Password, "application/json", "");
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(GeoIQ.Net.Data.AnalyticsResponse));
+                byte[] bytes = Encoding.ASCII.GetBytes(response);
+                System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
+                stream.Position = 0;
+                GeoIQ.Net.Data.AnalyticsResponse result = (GeoIQ.Net.Data.AnalyticsResponse)serializer.ReadObject(stream);
+
+                retval = result;
+            }
+            catch (Exception ex)
+            {
+                this.LastError = ex;
+                retval = null;
+            }
+            return retval;
+        }
+
+
+        public AnalyticsResponse Intersect(int overlayid1, int overlayid2, MergeOptions merge)
+        {
+            AnalyticsResponse retval = null;
+            try
+            {
+                GeoComWebClient request = new GeoComWebClient();
+                string mergestring = Enum.GetName(typeof(MergeOptions), merge);
                 string url = String.Format(_intersectTemplate, EndpointURI, overlayid1, overlayid2, mergestring);
                 setCredentials(request);
 
