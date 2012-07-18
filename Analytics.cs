@@ -55,6 +55,7 @@ namespace GeoIQ.Net
         private string _intersectTemplate = "{0}/analysis.json?calculation=intersect&ds1={1}&ds2={2}&merge={3}";
         private string _clipTemplate = "{0}/analysis.json?calculation=clip&ds1={1}&ds2={2}";
         private string _dissolveTemplate = "{0}/analysis.json?calculation=dissolve&ds1={1}&atr_1={2}";
+        private string _unionTemplate = "{0}/analysis.json?calculation=union&ds1={1}&ds2={2}&merge={3}";
 
         #endregion
 
@@ -196,6 +197,34 @@ namespace GeoIQ.Net
                 GeoComWebClient request = new GeoComWebClient();
                 string mergestring = Enum.GetName(typeof(MergeOptions), merge);
                 string url = String.Format(_intersectTemplate, EndpointURI, overlayid1, overlayid2, mergestring);
+                setCredentials(request);
+
+                //validateFileType(files);
+                string response = request.Post(url, UserName, Password, "application/json", "");
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(GeoIQ.Net.Data.AnalyticsResponse));
+                byte[] bytes = Encoding.ASCII.GetBytes(response);
+                System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
+                stream.Position = 0;
+                GeoIQ.Net.Data.AnalyticsResponse result = (GeoIQ.Net.Data.AnalyticsResponse)serializer.ReadObject(stream);
+
+                retval = result;
+            }
+            catch (Exception ex)
+            {
+                this.LastError = ex;
+                retval = null;
+            }
+            return retval;
+        }
+
+        public AnalyticsResponse Union(int overlayid1, int overlayid2, MergeOptions merge)
+        {
+            AnalyticsResponse retval = null;
+            try
+            {
+                GeoComWebClient request = new GeoComWebClient();
+                string mergestring = Enum.GetName(typeof(MergeOptions), merge);
+                string url = String.Format(_unionTemplate, EndpointURI, overlayid1, overlayid2, mergestring);
                 setCredentials(request);
 
                 //validateFileType(files);
