@@ -54,6 +54,7 @@ namespace GeoIQ.Net
         private string _bufferTemplate = "{0}/analysis.json?calculation=buffer&ds1={1}&distance={2}&unit={3}";
         private string _intersectTemplate = "{0}/analysis.json?calculation=intersect&ds1={1}&ds2={2}&merge={3}";
         private string _clipTemplate = "{0}/analysis.json?calculation=clip&ds1={1}&ds2={2}";
+        private string _dissolveTemplate = "{0}/analysis.json?calculation=dissolve&ds1={1}&atr_1={2}";
 
         #endregion
 
@@ -139,6 +140,33 @@ namespace GeoIQ.Net
             {
                 GeoComWebClient request = new GeoComWebClient();
                 string url = String.Format(_clipTemplate, EndpointURI, targetoverlayid, clippingoverlayid);
+                setCredentials(request);
+
+                //validateFileType(files);
+                string response = request.Post(url, UserName, Password, "application/json", "");
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(GeoIQ.Net.Data.AnalyticsResponse));
+                byte[] bytes = Encoding.ASCII.GetBytes(response);
+                System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
+                stream.Position = 0;
+                GeoIQ.Net.Data.AnalyticsResponse result = (GeoIQ.Net.Data.AnalyticsResponse)serializer.ReadObject(stream);
+
+                retval = result;
+            }
+            catch (Exception ex)
+            {
+                this.LastError = ex;
+                retval = null;
+            }
+            return retval;
+        }
+
+        public AnalyticsResponse Dissolve(int targetoverlayid, string columnName)
+        {
+            AnalyticsResponse retval = null;
+            try
+            {
+                GeoComWebClient request = new GeoComWebClient();
+                string url = String.Format(_dissolveTemplate, EndpointURI, targetoverlayid, columnName);
                 setCredentials(request);
 
                 //validateFileType(files);
